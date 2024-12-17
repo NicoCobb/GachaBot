@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, File, app_commands, Interaction, Attachment, Object
 from responses import get_response, target_angela
-from dataManagement import save, load_gems
+from dataManagement import save_user_gems, load_gems
 
 #step 0: load our token from somewhere safe
 load_dotenv()
@@ -16,9 +16,6 @@ intents: Intents = Intents.default()
 intents.message_content = True
 client: Client = Client(intents=intents)
 tree = app_commands.CommandTree(client)
-
-#TODO: when bot closes, need to save the gem count data to a txt file
-gemCount:int = 0
 
 #step 2: message functionality
 async def send_message(username: str, message: Message, user_message: str) -> None:
@@ -40,9 +37,9 @@ async def send_message(username: str, message: Message, user_message: str) -> No
 
     try:
         response: str = get_response(user_message)
-        if response == 'asstarion':
-            await message.channel.send(file=File('./gachaPullImages/asstarion.jpg'))
-            return
+        # if response == 'asstarion':
+        #     await message.channel.send(file=File('./gachaPullImages/asstarion.jpg'))
+        #     return
         await message.add_reaction('❤')
         await message.author.send(response) if is_private else await message.channel.send(response)
     except Exception as e:
@@ -51,10 +48,6 @@ async def send_message(username: str, message: Message, user_message: str) -> No
 #step 3: handling startup for bot
 @client.event
 async def on_ready() -> None:
-    global gemCount
-    #load from save file
-    gemCount = load_gems()
-
     await tree.sync(guild=Object(id=GUILD_ID))
     print(f'{client.user} is now running!')
 
@@ -76,15 +69,26 @@ async def on_message(message: Message) -> None:
 #TODO: have it also take in a target user
 @tree.command(
         name="grant_gems",
-        description="Add a gacha gem",
+        description="Give a user some number of gems (can also be negative)",
         guild=Object(id=GUILD_ID)
 ) 
-async def grant_gems(interaction: Interaction, number: int) -> None:
-    global gemCount
-    gemCount += number
-    save(gemCount)
+async def grant_gems(interaction: Interaction, user: str, added: int) -> None:
+    print('is anything print???:::?')
+    gemCount = save_user_gems(user, added)
     try:
         await interaction.response.send_message(f'new gem count is {gemCount}!')
+    except Exception as e:
+        print(e)
+
+@tree.command(
+        name="check_gems",
+        description="check a users gem count",
+        guild=Object(id=GUILD_ID)
+)
+async def check_gems(interaction: Interaction, user: str) -> None:
+    gemCount = load_gems(user)
+    try:
+        await interaction.response.send_message(f'User {user} has {gemCount} gems!')
     except Exception as e:
         print(e)
 
