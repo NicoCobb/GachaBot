@@ -1,8 +1,9 @@
 from typing import Final
 import os
 from dotenv import load_dotenv
-from discord import Intents, Client, Message, File, app_commands, Interaction, Object
+from discord import Intents, Client, Message, File, app_commands, Interaction, Attachment, Object
 from responses import get_response, target_angela
+from dataManagement import save, load_gems
 
 #step 0: load our token from somewhere safe
 load_dotenv()
@@ -50,6 +51,10 @@ async def send_message(username: str, message: Message, user_message: str) -> No
 #step 3: handling startup for bot
 @client.event
 async def on_ready() -> None:
+    global gemCount
+    #load from save file
+    gemCount = load_gems()
+
     await tree.sync(guild=Object(id=GUILD_ID))
     print(f'{client.user} is now running!')
 
@@ -68,18 +73,39 @@ async def on_message(message: Message) -> None:
     await send_message(username, message, user_message)
 
 #slash commands
+#TODO: have it also take in a target user
 @tree.command(
-        name="get_gem",
+        name="grant_gems",
         description="Add a gacha gem",
         guild=Object(id=GUILD_ID)
 ) 
-async def add_gem(interaction: Interaction) -> None:
+async def grant_gems(interaction: Interaction, number: int) -> None:
     global gemCount
-    gemCount += 1
+    gemCount += number
+    save(gemCount)
     try:
         await interaction.response.send_message(f'new gem count is {gemCount}!')
     except Exception as e:
         print(e)
+
+#TODO: pull
+#each pull will need 20 gems
+
+#TODO: addImage (takes in picture and star level)
+@tree.command(
+        name="add_image",
+        description="Upload a new image and give it a star rating",
+        guild=Object(id=GUILD_ID)
+)
+async def add_image(interaction: Interaction, file: Attachment, star: int) -> None:
+    try:
+        await interaction.response.send_message(f'image added with star rating {star}!')
+    except Exception as e:
+        print(e)
+
+#TODO: dailyLogin (2 gems)
+
+#TODO: roll_d20
 
 #step 5: main entry point
 def main() -> None:

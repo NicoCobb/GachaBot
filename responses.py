@@ -21,3 +21,6 @@ def target_angela() -> str:
                     'yap yap yap yap blah blah blahhhhhh',
                     'how about you meow for me instead?',
                     'silence woman'])
+
+#TODO: be nice to her sometimes
+#random chance to respond
