@@ -7,8 +7,6 @@ def get_response(user_input: str) -> str:
         return 'u quiet af'
     elif 'hell' in lowered:
         return 'heyyyy'
-    elif 'roll dice' in lowered:
-        return f'you rolled: {randint(1,20)}'
     elif 'asstarion' in lowered:
         return 'asstarion'
     else:

@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, File, app_commands, Interaction, Attachment, Object
 from responses import get_response, target_angela
+from random import choice, randint
 from dataManagement import save_user_gems, load_gems
 
 #step 0: load our token from somewhere safe
@@ -110,6 +111,16 @@ async def add_image(interaction: Interaction, file: Attachment, star: int) -> No
 #TODO: dailyLogin (2 gems)
 
 #TODO: roll_d20
+@tree.command(
+        name="roll_d20",
+        description="roll a d20",
+        guild=Object(id=GUILD_ID)
+)
+async def roll_d20(interaction: Interaction) -> None:
+    try:
+        await interaction.response.send_message(f'you rolled: {randint(1,20)}!')
+    except Exception as e:
+        print(e)
 
 #step 5: main entry point
 def main() -> None:
