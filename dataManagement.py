@@ -1,29 +1,49 @@
 import json
 from datetime import datetime
 
-
-def save_user_gems(user: str, gems: int) -> int:
-    file_exists = True
-    print('printoooooo')
+#returns the new total of a given star rating after update
+def save_new_image(star: int) -> int:
+    empty= False
     with open('data.json', 'r', encoding='utf-8') as f:
         try:
             data = json.load(f)
         except json.decoder.JSONDecodeError:
-            file_exists = False
+            empty = True
+    
+    with open('data.json', 'w', encoding='utf-8') as f:
+        if not empty:
+            print(star)
+            if 'starCounts' in data:
+                print('star counts exists')
+                if star in data['starCounts']:
+                    print('star key exists in starCounts')
+                    data['starCounts'][star] += 1
+                else:
+                    data['starCounts'][star] = 1
+        else:
+            data = {}
+            data['starCounts'] = {}
+            data['starCounts'][star] = 1
+        
+        json.dump(data, f, ensure_ascii=False, indent=4)
+        return data['starCounts'][star]
 
+def save_user_gems(user: str, gems: int) -> int:
+    empty = False
+    with open('data.json', 'r', encoding='utf-8') as f:
+        try:
+            data = json.load(f)
+        except json.decoder.JSONDecodeError:
+            empty = True
 
     with open('data.json', 'w', encoding='utf-8') as f:
-        if file_exists:
+        if not empty:
             if user in data:
-                print('got here')
                 if 'gems' in data[user]:
-                    print(f"got here and gems is {data[user]['gems']} and add is {gems}")
                     data[user]['gems'] += gems
                 else:
-                    print('hit the else')
                     data[user]['gems'] = gems
             else:
-                print('final else')
                 data[user] = {}
                 data[user]['gems'] = gems
 
@@ -36,12 +56,6 @@ def save_user_gems(user: str, gems: int) -> int:
         return data[user]['gems']
 
 def load_gems(user: str) -> int:
-    #create data.json if it doesn't exist yet
-    try:
-        f = open('data.json', 'x')
-    except Exception as e:
-        print(e)
-    
     with open('data.json', 'r') as f:
         try:
             data = json.load(f)
@@ -54,5 +68,9 @@ def load_gems(user: str) -> int:
     else:
         return 0
 
-    
-    # def check_daily() -> None:
+def attempt_create_json() -> None:
+    #create data.json if it doesn't exist yet
+    try:
+        open('data.json', 'x')
+    except Exception as e:
+        print(e)

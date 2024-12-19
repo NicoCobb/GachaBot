@@ -1,4 +1,4 @@
-from random import choice, randint
+from random import choice
 
 def get_response(user_input: str) -> str:
     lowered: str = user_input.lower()
@@ -14,11 +14,13 @@ def get_response(user_input: str) -> str:
                        'please say something clearer',
                        'try again thx <3'])
     
-def target_angela() -> str:
+def bully_target_response() -> str:
     return choice (['Angela nobody asked',
                     'yap yap yap yap blah blah blahhhhhh',
                     'how about you meow for me instead?',
-                    'silence woman'])
+                    'silence woman',
+                    'no u',
+                    'this kitty doesn\'t know how to shut UP'])
 
 #TODO: be nice to her sometimes
 #random chance to respond

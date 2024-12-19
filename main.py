@@ -1,10 +1,10 @@
 from typing import Final
 import os
 from dotenv import load_dotenv
-from discord import Intents, Client, Message, File, app_commands, Interaction, Attachment, Object
-from responses import get_response, target_angela
-from random import choice, randint
-from dataManagement import save_user_gems, load_gems
+from discord import Intents, Client, Message, app_commands, Interaction, Attachment, Object
+from responses import get_response, bully_target_response
+from random import randint
+from dataManagement import save_user_gems, load_gems, save_new_image, attempt_create_json
 
 #step 0: load our token from somewhere safe
 load_dotenv()
@@ -25,30 +25,43 @@ async def send_message(username: str, message: Message, user_message: str) -> No
         return
     
     if username == BULLY:
-        try:
-            response: str = target_angela()
-            await message.add_reaction('👎')
-            await message.channel.send(response)
-        except Exception as e:
-            print(e)
-        return
+        if randint(1, 20) >= 10:
+            try:
+                response: str = bully_target_response()
+                await message.add_reaction('👎')
+                await message.channel.send(response)
+            except Exception as e:
+                print(e)
+            return
 
-    if is_private:= user_message[0] == '?':
-        user_message = user_message[1:]
+    # if is_private:= user_message[0] == '?':
+    #     user_message = user_message[1:]
 
-    try:
-        response: str = get_response(user_message)
-        # if response == 'asstarion':
-        #     await message.channel.send(file=File('./gachaPullImages/asstarion.jpg'))
-        #     return
-        await message.add_reaction('❤')
-        await message.author.send(response) if is_private else await message.channel.send(response)
-    except Exception as e:
-        print(e)
+    # try:
+    #     response: str = get_response(user_message)
+    #     # if response == 'asstarion':
+    #     #     await message.channel.send(file=File('./gachaPullImages/asstarion.jpg'))
+    #     #     return
+    #     await message.add_reaction('❤')
+    #     await message.author.send(response) if is_private else await message.channel.send(response)
+    # except Exception as e:
+    #     print(e)
 
 #step 3: handling startup for bot
 @client.event
 async def on_ready() -> None:
+    #check the correct folder system exists
+    nested_folders = ['GachaImages/1',
+                      'GachaImages/2',
+                      'GachaImages/3',
+                      'GachaImages/4',
+                      'GachaImages/5',
+                      'GachaImages/6']
+    for folder in nested_folders:
+        os.makedirs(folder, exist_ok=True)
+
+    attempt_create_json()
+    
     await tree.sync(guild=Object(id=GUILD_ID))
     print(f'{client.user} is now running!')
 
@@ -72,7 +85,7 @@ async def on_message(message: Message) -> None:
         name="grant_gems",
         description="Give a user some number of gems (can also be negative)",
         guild=Object(id=GUILD_ID)
-) 
+)
 async def grant_gems(interaction: Interaction, user: str, added: int) -> None:
     print('is anything print???:::?')
     gemCount = save_user_gems(user, added)
@@ -102,9 +115,29 @@ async def check_gems(interaction: Interaction, user: str) -> None:
         description="Upload a new image and give it a star rating",
         guild=Object(id=GUILD_ID)
 )
-async def add_image(interaction: Interaction, file: Attachment, star: int) -> None:
+@app_commands.choices(star=[
+    app_commands.Choice(name='⭐', value=1),
+    app_commands.Choice(name='⭐⭐', value=2),
+    app_commands.Choice(name='⭐⭐⭐', value=3),
+    app_commands.Choice(name='⭐⭐⭐⭐', value=4),
+    app_commands.Choice(name='⭐⭐⭐⭐⭐', value=5),
+    app_commands.Choice(name='🌟🌟🌟🌟🌟🌟‼️‼️', value=6),
+])
+async def add_image(interaction: Interaction, file: Attachment, star: app_commands.Choice[int]) -> None:
+    #func to check how many files exist of a given star rating for naming
+    imageType = file.content_type.split('/')
+    if not 'image' in imageType[0]:
+        try:
+            await interaction.response.send_message(f'attachment must be an image!')
+        except Exception as e:
+            print(e)
+        return
+    
+    total = save_new_image(star.value)
+    filename = f"{total}." + imageType[1]
+    await file.save(fp="GachaImages/{}/{}".format(star.value,filename))
     try:
-        await interaction.response.send_message(f'image added with star rating {star}!')
+        await interaction.response.send_message(f'image added with star rating {star.value}!')
     except Exception as e:
         print(e)
 
