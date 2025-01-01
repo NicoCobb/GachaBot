@@ -1,0 +1,10 @@
+#ignore all images
+/GachaImages
+
+#ignore the venv folder
+/venv
+
+#ignore data file
+data.json
+
+.env

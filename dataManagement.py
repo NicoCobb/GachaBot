@@ -3,6 +3,7 @@ from datetime import datetime
 
 #returns the new total of a given star rating after update
 def save_new_image(star: int) -> int:
+    starStr = str(star)
     empty= False
     with open('data.json', 'r', encoding='utf-8') as f:
         try:
@@ -15,18 +16,18 @@ def save_new_image(star: int) -> int:
             print(star)
             if 'starCounts' in data:
                 print('star counts exists')
-                if star in data['starCounts']:
+                if starStr in data['starCounts']:
                     print('star key exists in starCounts')
-                    data['starCounts'][star] += 1
+                    data['starCounts'][starStr] += 1
                 else:
-                    data['starCounts'][star] = 1
+                    data['starCounts'][starStr] = 1
         else:
             data = {}
             data['starCounts'] = {}
-            data['starCounts'][star] = 1
+            data['starCounts'][starStr] = 1
         
         json.dump(data, f, ensure_ascii=False, indent=4)
-        return data['starCounts'][star]
+        return data['starCounts'][starStr]
 
 def save_user_gems(user: str, gems: int) -> int:
     empty = False

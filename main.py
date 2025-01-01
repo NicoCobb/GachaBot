@@ -106,15 +106,6 @@ async def check_gems(interaction: Interaction, user: str) -> None:
     except Exception as e:
         print(e)
 
-#TODO: pull
-#each pull will need 20 gems
-@tree.command(
-    name="pull",
-    description="GACHA PULL BABYYYYY",
-    guild=Object(id=GUILD_ID)
-)
-async def pull() -> None:
-    return None
 
 #TODO: addImage (takes in picture and star level)
 @tree.command(
