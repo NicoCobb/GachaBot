@@ -7,6 +7,4 @@
 #ignore data file
 data.json
 
-.env
-
 __pycache__

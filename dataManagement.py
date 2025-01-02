@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 #returns the new total of a given star rating after update
 def save_new_image(star: int) -> int:
@@ -15,12 +14,13 @@ def save_new_image(star: int) -> int:
         if not empty:
             print(star)
             if 'starCounts' in data:
-                print('star counts exists')
                 if starStr in data['starCounts']:
-                    print('star key exists in starCounts')
                     data['starCounts'][starStr] += 1
                 else:
                     data['starCounts'][starStr] = 1
+            else:
+                data['starCounts'] = {}
+                data['starCounts'][starStr] = 1 
         else:
             data = {}
             data['starCounts'] = {}
@@ -63,9 +63,24 @@ def load_gems(user: str) -> int:
         except json.decoder.JSONDecodeError:
             print('empty file')
             return 0
-        
+
+    if not user in data:
+        return 0    
     if data[user]['gems']:
         return data[user]['gems']
+    else:
+        return 0
+def load_star_total(star: int) -> int:
+    with open('data.json', 'r') as f:
+        try:
+            data = json.load(f)
+        except json.decoder.JSONDecodeError:
+            print('empty file')
+            return 0
+    
+    starStr = str(star)
+    if starStr in data['starCounts']:
+        return data['starCounts'][starStr]
     else:
         return 0
 
