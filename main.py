@@ -11,6 +11,7 @@ load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
 BULLY: Final[str] = os.getenv('BULLY_TARGET')
 GUILD_ID: Final[int] = os.getenv('SERVER_ID')
+GACHA_DM: Final[str] = os.getenv('GACHA_DM')
 ACCEPTED_FILE_TYPES = ['jpg', 'jpeg', 'png', 'mov', 'mp4']
 
 #bot setup
@@ -60,9 +61,6 @@ async def on_message(message: Message) -> None:
     
     username: str = str(message.author)
     user_message: str = message.content
-    channel: str = str(message.channel)
-
-    print(f'[{channel}] {username}: "{user_message}"')
 
     await send_message(username, message, user_message)
 
@@ -74,6 +72,9 @@ async def on_message(message: Message) -> None:
         guild=Object(id=GUILD_ID)
 )
 async def grant_gems(interaction: Interaction, user: str, added: int) -> None:
+    if interaction.user.name != GACHA_DM:
+        await interaction.response.send_message(f'Only {GACHA_DM} can award gems!!!!')
+        return
     gemCount = save_user_gems(user, added)
     try:
         await interaction.response.send_message(f'new gem count is {gemCount}!')
@@ -138,6 +139,10 @@ async def pull_image(interaction: Interaction) -> None:
     app_commands.Choice(name='🌟🌟🌟🌟🌟‼️‼️', value=5),
 ])
 async def add_image(interaction: Interaction, file: Attachment, star: app_commands.Choice[int]) -> None:
+    if interaction.user.name != GACHA_DM:
+        await interaction.response.send_message(f'Only {GACHA_DM} can add media!!!!')
+        return
+
     #func to check how many files exist of a given star rating for naming
     imageType = file.content_type.split('/')
     if not ('image' in imageType[0] or 'video' in imageType[0]):
