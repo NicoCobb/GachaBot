@@ -9,4 +9,4 @@ A bot used for making personal gacha games to run in discord channels, where you
 4. pip install -r requirements.txt
 5. Fill in the .env file with your bot token, serverID, and corresponding usernames
 6. Add your bot to your server
-7. Run your code and begin!
+7. Run main.py code and begin!
