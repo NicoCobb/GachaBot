@@ -2,7 +2,7 @@ from typing import Final
 import os
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, app_commands, Interaction, Attachment, Object, File
-from responses import bully_target_response
+from responses import bully_target_response, bully_response_two
 from random import randint
 from dataManagement import save_user_gems, load_gems, save_new_image, attempt_create_json, load_star_total
 
@@ -27,7 +27,7 @@ async def send_message(username: str, message: Message, user_message: str) -> No
         return
     
     if username == BULLY:
-        if randint(1, 20) >= 18:
+        if randint(1, 20) >= 15:
             try:
                 response: str = bully_target_response()
                 await message.add_reaction('👎')
@@ -35,6 +35,16 @@ async def send_message(username: str, message: Message, user_message: str) -> No
             except Exception as e:
                 print(e)
             return
+    if username == 'alegnas':
+        if randint(1, 20) >= 15:
+            try:
+                response: str = bully_response_two()
+                await message.add_reaction('👎')
+                await message.channel.send(response)
+            except Exception as e:
+                print(e)
+            return
+
 
 #handling startup for bot
 @client.event
@@ -44,7 +54,8 @@ async def on_ready() -> None:
                       'GachaImages/2',
                       'GachaImages/3',
                       'GachaImages/4',
-                      'GachaImages/5']
+                      'GachaImages/5',
+                      'GachaImages/6']
     for folder in nested_folders:
         os.makedirs(folder, exist_ok=True)
 
@@ -124,8 +135,6 @@ async def pull_image(interaction: Interaction) -> None:
                 break
         await interaction.response.send_message(f'{star} star!', file=File(selectedFile))
     
-
-#TODO: addImage (takes in picture and star level)
 @tree.command(
         name="add_media",
         description="Upload a new image or video and give it a star rating",
@@ -136,7 +145,8 @@ async def pull_image(interaction: Interaction) -> None:
     app_commands.Choice(name='⭐⭐', value=2),
     app_commands.Choice(name='⭐⭐⭐', value=3),
     app_commands.Choice(name='⭐⭐⭐⭐', value=4),
-    app_commands.Choice(name='🌟🌟🌟🌟🌟‼️‼️', value=5),
+    app_commands.Choice(name='⭐⭐⭐⭐⭐', value=5),
+    app_commands.Choice(name='🌟🌟🌟🌟🌟🌟‼️‼️', value=6),
 ])
 async def add_image(interaction: Interaction, file: Attachment, star: app_commands.Choice[int]) -> None:
     if interaction.user.name != GACHA_DM:
@@ -178,17 +188,19 @@ async def roll_d20(interaction: Interaction) -> None:
 #----------------------------------------------------------------------------------
 
 def randomize_star() -> int:
-    num = randint(1, 100)
-    if num < 40:
+    num = randint(0, 99)
+    if num < 33:
         return 1
-    if num >=40 and num < 65:
+    if num >=33 and num < 61:
         return 2
-    if num >=65 and num < 80:
+    if num >=61 and num < 78:
         return 3
-    if num >=80 and num < 91:
+    if num >=78 and num < 90:
         return 4
-    if num >=91:
+    if num >=90 and num < 99:
         return 5
+    if num >=99:
+        return 6
 
 #main entry point
 def main() -> None:
